@@ -1,7 +1,12 @@
 package com.sandbox.device.api.controller;
 
+import com.sandbox.device.api.exception.DeviceBusinessRuleException;
+import com.sandbox.device.api.controller.request.CreateDeviceRequest;
 import com.sandbox.device.api.domain.Device;
 import com.sandbox.device.api.service.DeviceService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,22 +22,23 @@ public class DeviceController {
     }
 
     @PostMapping
-    public Device create(){
-        return deviceService.create();
+    public ResponseEntity<Device> create(@Valid @RequestBody CreateDeviceRequest request) throws DeviceBusinessRuleException {
+        return new ResponseEntity<>(deviceService.create(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public Device findById(Integer id) {
-        return deviceService.findById(id);
+    public ResponseEntity<Device> findById(@PathVariable Integer id) {
+        return new ResponseEntity<>(deviceService.findById(id), HttpStatus.OK);
     }
 
     @GetMapping
-    public List<Device> findAll() {
-        return deviceService.findAll();
+    public ResponseEntity<List<Device>> findAll() {
+        return new ResponseEntity<>(deviceService.findAll(), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
+    public ResponseEntity<?> delete(@PathVariable Integer id) throws DeviceBusinessRuleException {
         deviceService.delete(id);
+        return ResponseEntity.ok().build();
     }
 }
