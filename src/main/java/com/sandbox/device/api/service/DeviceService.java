@@ -1,5 +1,6 @@
 package com.sandbox.device.api.service;
 
+import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
 import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.controller.request.CreateDeviceRequest;
 import com.sandbox.device.api.domain.Device;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DeviceService {
@@ -30,18 +32,47 @@ public class DeviceService {
         return deviceRepository.save(device);
     }
 
+    public Device update(Integer id, UpdateDeviceRequest updateRequest) throws DeviceBusinessRuleException {
+
+        Device deviceToUpdate = findById(id);
+
+        if(deviceRepository.existsByNameAndBrandAndIdNot(updateRequest.name(), updateRequest.brand(), id)) {
+            throw new DeviceBusinessRuleException("Device with the same name and brand already exists and this combination must be unique");
+        }
+
+        if (updateRequest.name() != null) {
+            deviceToUpdate.setName(updateRequest.name());
+        }
+
+        if (updateRequest.brand() != null) {
+            deviceToUpdate.setBrand(updateRequest.brand());
+        }
+
+        if(updateRequest.state() != null) {
+            deviceToUpdate.setState(updateRequest.state());
+        }
+
+        return deviceRepository.save(deviceToUpdate);
+    }
 
     public Device findById(Integer id) {
         return deviceRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
     }
 
-    public List<Device> findAll() {
-        return deviceRepository.findAll();
-    }
+    public List<Device> findDevices(Optional<String> name, Optional<String> brand){
 
-    public Device update(Device device) {
-        return deviceRepository.save(device);
+        if(name.isEmpty() && brand.isEmpty()) {
+           return deviceRepository.findAll();
+        }
+
+        if(name.isPresent() && brand.isPresent()) {
+            return deviceRepository.findByNameAndBrand(name.get(), brand.get());
+        } else if (name.isPresent()) {
+            return deviceRepository.findByName(name.get());
+        } else{
+            return deviceRepository.findByBrand(brand.get());
+        }
     }
 
     public void delete(Integer id) throws DeviceBusinessRuleException {
