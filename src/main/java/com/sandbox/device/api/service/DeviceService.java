@@ -36,6 +36,10 @@ public class DeviceService {
 
         Device deviceToUpdate = findById(id);
 
+        if(updateRequest.isBlank()) {
+            throw new DeviceBusinessRuleException("At least one field must be provided for update.");
+        }
+
         if(deviceRepository.existsByNameAndBrandAndIdNot(updateRequest.name(), updateRequest.brand(), id)) {
             throw new DeviceBusinessRuleException("Device with the same name and brand already exists and this combination must be unique");
         }
