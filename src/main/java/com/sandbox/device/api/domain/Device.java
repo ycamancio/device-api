@@ -2,12 +2,12 @@ package com.sandbox.device.api.domain;
 
 import com.sandbox.device.api.enums.DeviceState;
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "brand"}))
 public class Device {
 
     @Id
