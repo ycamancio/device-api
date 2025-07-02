@@ -16,6 +16,4 @@ public interface DeviceRepository extends JpaRepository<Device, Integer> {
     List<Device> findByName(String name);
 
     List<Device> findByBrand(String brand);
-
-    List<Device> findByNameAndBrand(String name, String brand);
 }

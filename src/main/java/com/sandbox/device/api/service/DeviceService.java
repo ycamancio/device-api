@@ -1,17 +1,16 @@
 package com.sandbox.device.api.service;
 
-import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
-import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.controller.request.CreateDeviceRequest;
+import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
 import com.sandbox.device.api.domain.Device;
 import com.sandbox.device.api.enums.DeviceState;
+import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.repository.DeviceRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DeviceService {
@@ -64,22 +63,27 @@ public class DeviceService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
     }
 
-    public List<Device> findDevices(Optional<String> name, Optional<String> brand){
-
-        if(name.isEmpty() && brand.isEmpty()) {
-           return deviceRepository.findAll();
+    public List<Device> findByName(String name) {
+        List<Device> devices = deviceRepository.findByName(name);
+        if (devices.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No devices found with the given name");
         }
-
-        if(name.isPresent() && brand.isPresent()) {
-            return deviceRepository.findByNameAndBrand(name.get(), brand.get());
-        } else if (name.isPresent()) {
-            return deviceRepository.findByName(name.get());
-        } else{
-            return deviceRepository.findByBrand(brand.get());
-        }
+        return devices;
     }
 
-    public void delete(Integer id) throws DeviceBusinessRuleException {
+    public List<Device> findByBrand(String brand) {
+        List<Device> devices = deviceRepository.findByBrand(brand);
+        if (devices.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No devices found with the given brand");
+        }
+        return devices;
+    }
+
+    public List<Device> findAll() {
+        return deviceRepository.findAll();
+    }
+
+    public void deleteById(Integer id) throws DeviceBusinessRuleException {
 
         Device device = findById(id);
         if (device.getState() == DeviceState.IN_USE){

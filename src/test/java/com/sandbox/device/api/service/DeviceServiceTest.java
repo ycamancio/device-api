@@ -8,11 +8,14 @@ import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.repository.DeviceRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -141,4 +144,107 @@ public class DeviceServiceTest {
         assertEquals(mockDevice.getState(), result.getState());
     }
 
+    @Test
+    void when_findByName_and_noDevicesFound_then_throwResponseStatusException() {
+
+        when(deviceRepository.findByName(anyString())).thenReturn(List.of());
+
+        assertThrows(ResponseStatusException.class, () -> deviceService.findByName("NonExistentDevice"));
+    }
+
+    @Test
+    void when_findByName_and_devicesFound_then_returnDevices() {
+
+        String searchParameter = "Device1";
+        Device mockDevice1 = new Device("Device1", "Brand1", DeviceState.AVAILABLE);
+        Device mockDevice2 = new Device("Device1", "Brand2", DeviceState.IN_USE);
+
+        when(deviceRepository.findByName(anyString())).thenReturn(List.of(mockDevice1, mockDevice2));
+
+        List<Device> result = deviceService.findByName(searchParameter);
+
+        assertEquals(2, result.size());
+        assertEquals(searchParameter, result.get(0).getName());
+        assertEquals(searchParameter, result.get(1).getName());
+    }
+
+    @Test
+    void when_findByBrand_and_noDevicesFound_then_throwResponseStatusException() {
+
+        when(deviceRepository.findByBrand(anyString())).thenReturn(List.of());
+
+        assertThrows(ResponseStatusException.class, () -> deviceService.findByBrand("NonExistentBrand"));
+    }
+
+    @Test
+    void when_findByBrand_and_devicesFound_then_returnDevices() {
+
+        String searchParameter = "Brand1";
+        Device mockDevice1 = new Device("Device1", "Brand1", DeviceState.AVAILABLE);
+        Device mockDevice2 = new Device("Device2", "Brand1", DeviceState.IN_USE);
+
+        when(deviceRepository.findByBrand(anyString())).thenReturn(List.of(mockDevice1, mockDevice2));
+
+        List<Device> result = deviceService.findByBrand(searchParameter);
+
+        assertEquals(2, result.size());
+        assertEquals(searchParameter, result.get(0).getBrand());
+        assertEquals(searchParameter, result.get(1).getBrand());
+    }
+
+    @Test
+    void when_findAll_and_thereAreNoDevices_then_returnEmptyList() {
+
+        when(deviceRepository.findAll()).thenReturn(List.of());
+
+        List<Device> result = deviceService.findAll();
+
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void when_findAll_and_thereAreDevices_then_returnListOfDevices() {
+
+        Device mockDevice1 = new Device("Device1", "Brand1", DeviceState.AVAILABLE);
+        Device mockDevice2 = new Device("Device2", "Brand2", DeviceState.IN_USE);
+
+        when(deviceRepository.findAll()).thenReturn(List.of(mockDevice1, mockDevice2));
+
+        List<Device> result = deviceService.findAll();
+
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void when_deleteById_and_deviceDoesNotExist_then_throwResponseStatusException() {
+
+        when(deviceRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> deviceService.deleteById(1));
+        verify(deviceRepository, never()).deleteById(anyInt());
+    }
+
+    @Test
+    void when_deleteById_and_deviceIsInUse_then_throwDeviceBusinessRuleException() {
+
+        Device mockDevice = new Device("Device1", "Brand1", DeviceState.IN_USE);
+
+        when(deviceRepository.findById(anyInt())).thenReturn(Optional.of(mockDevice));
+
+        assertThrows(DeviceBusinessRuleException.class, () -> deviceService.deleteById(1));
+        verify(deviceRepository, never()).deleteById(anyInt());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DeviceState.class, names = {"AVAILABLE", "INACTIVE"})
+    void when_deleteById_and_deviceIsNotInUse_then_deleteDevice(DeviceState state) throws DeviceBusinessRuleException {
+
+        Device mockDevice = new Device("Device1", "Brand1", state);
+
+        when(deviceRepository.findById(anyInt())).thenReturn(Optional.of(mockDevice));
+
+        deviceService.deleteById(1);
+
+        verify(deviceRepository).deleteById(1);
+    }
 }

@@ -38,15 +38,24 @@ public class DeviceController {
         return new ResponseEntity<>(deviceService.findById(id), HttpStatus.OK);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<Device>> findDevices(@RequestParam Optional<String> name,
-                                                     @RequestParam Optional<String> brand){
-        return ResponseEntity.ok(deviceService.findDevices(name, brand));
+    @GetMapping
+    public ResponseEntity<List<Device>> findAll(){
+        return ResponseEntity.ok(deviceService.findAll());
+    }
+
+    @GetMapping(params = "name")
+    public ResponseEntity<List<Device>> findByName(@RequestParam String name) {
+        return ResponseEntity.ok(deviceService.findByName(name));
+    }
+
+    @GetMapping(params = "brand")
+    public ResponseEntity<List<Device>> findByBrand(@RequestParam String brand) {
+        return ResponseEntity.ok(deviceService.findByBrand(brand));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) throws DeviceBusinessRuleException {
-        deviceService.delete(id);
+        deviceService.deleteById(id);
         return ResponseEntity.ok().build();
     }
 }
