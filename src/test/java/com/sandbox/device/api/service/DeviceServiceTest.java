@@ -227,11 +227,11 @@ public class DeviceServiceTest {
     }
 
     @Test
-    void when_deleteById_and_deviceDoesNotExist_then_throwResponseStatusException() {
+    void when_deleteById_and_deviceDoesNotExist_then_doNothing() throws DeviceBusinessRuleException {
 
         when(deviceRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> deviceService.deleteById(1));
+        deviceService.deleteById(1);
         verify(deviceRepository, never()).deleteById(anyInt());
     }
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.sandbox.device.api.constants.AuditConstants.*;
 import static com.sandbox.device.api.constants.ErrorConstants.*;
@@ -98,8 +99,13 @@ public class DeviceService {
     @Auditable(action = AuditAction.DELETE, description = ACTION_DELETING_DEVICE_DESCRIPTION)
     public void deleteById(Integer id) throws DeviceBusinessRuleException {
 
-        Device device = findById(id);
-        if (device.getState() == DeviceState.IN_USE){
+        Optional<Device> device = deviceRepository.findById(id);
+
+        if(device.isEmpty()){
+            return;
+        }
+
+        if (device.get().getState() == DeviceState.IN_USE){
             createApiErrorAndThrowException(ErrorType.BUSINESS_RULE,
                     DEVICE_IN_USE_CAN_NOT_BE_DELETED_CODE, DEVICE_IN_USE_CAN_NOT_BE_DELETED_MESSAGE);
         }
