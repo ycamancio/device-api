@@ -4,6 +4,8 @@ import com.sandbox.device.api.controller.request.CreateDeviceRequest;
 import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
 import com.sandbox.device.api.domain.Device;
 import com.sandbox.device.api.enums.DeviceState;
+import com.sandbox.device.api.enums.ErrorType;
+import com.sandbox.device.api.errorHandling.ApiError;
 import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.repository.DeviceRepository;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+
+import static com.sandbox.device.api.errorHandling.ErrorConstants.*;
 
 @Service
 public class DeviceService {
@@ -24,7 +28,8 @@ public class DeviceService {
     public Device create(CreateDeviceRequest request) throws DeviceBusinessRuleException {
 
         if(deviceRepository.existsByNameAndBrand(request.name(), request.brand())) {
-            throw new DeviceBusinessRuleException("Device with the same name and brand already exists.");
+            createApiErrorAndThrowException(ErrorType.BUSINESS_RULE,
+                    DEVICE_COMBO_ALREADY_EXISTS_CODE, DEVICE_COMBO_ALREADY_EXISTS_CODE_MESSAGE);
         }
 
         Device device = new Device(request.name(), request.brand(), DeviceState.AVAILABLE);
@@ -36,11 +41,13 @@ public class DeviceService {
         Device deviceToUpdate = findById(id);
 
         if(updateRequest.isBlank()) {
-            throw new DeviceBusinessRuleException("At least one field must be provided for update.");
+            createApiErrorAndThrowException(ErrorType.BUSINESS_RULE,
+                    UPDATE_REQUEST_NEEDS_AT_LEAST_ONE_FIELD_CODE, UPDATE_REQUEST_NEEDS_AT_LEAST_ONE_FIELD_MESSAGE);
         }
 
         if(deviceRepository.existsByNameAndBrandAndIdNot(updateRequest.name(), updateRequest.brand(), id)) {
-            throw new DeviceBusinessRuleException("Device with the same name and brand already exists and this combination must be unique");
+            createApiErrorAndThrowException(ErrorType.BUSINESS_RULE,
+                    DEVICE_COMBO_MUST_BE_UNIQUE_CODE, DEVICE_COMBO_MUST_BE_UNIQUE_MESSAGE);
         }
 
         if (updateRequest.name() != null) {
@@ -87,9 +94,15 @@ public class DeviceService {
 
         Device device = findById(id);
         if (device.getState() == DeviceState.IN_USE){
-            throw new DeviceBusinessRuleException("Cannot delete a device that is currently in use.");
+            createApiErrorAndThrowException(ErrorType.BUSINESS_RULE,
+                    DEVICE_IN_USE_CAN_NOT_BE_DELETED_CODE, DEVICE_IN_USE_CAN_NOT_BE_DELETED_MESSAGE);
         }
 
         deviceRepository.deleteById(id);
+    }
+
+    private void createApiErrorAndThrowException(ErrorType type, int code, String message) throws DeviceBusinessRuleException {
+        ApiError error = new ApiError(type, code, message);
+        throw new DeviceBusinessRuleException(error);
     }
 }

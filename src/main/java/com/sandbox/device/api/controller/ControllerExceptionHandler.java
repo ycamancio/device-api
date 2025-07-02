@@ -1,7 +1,7 @@
 package com.sandbox.device.api.controller;
 
-import com.sandbox.device.api.controller.response.ErrorApiResponse;
 import com.sandbox.device.api.enums.ErrorType;
+import com.sandbox.device.api.errorHandling.ApiError;
 import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +19,15 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(DeviceBusinessRuleException.class)
     public ResponseEntity<?> handleDeviceBusinessRuleException(DeviceBusinessRuleException e) {
-        ErrorApiResponse errorApiResponse = new ErrorApiResponse(ErrorType.BUSINESS_RULE, e.getMessage());
-        return new ResponseEntity<>(errorApiResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getApiError(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 
-        List<ErrorApiResponse> errorList = new ArrayList<>();
+        List<ApiError> errorList = new ArrayList<>();
         for(FieldError error : e.getFieldErrors()){
-            errorList.add(new ErrorApiResponse(ErrorType.INVALID_REQUEST, error.getDefaultMessage()));
+            errorList.add(new ApiError(ErrorType.INVALID_REQUEST, error.getDefaultMessage()));
         }
         return new ResponseEntity<>(errorList, HttpStatus.BAD_REQUEST);
     }

@@ -4,6 +4,7 @@ import com.sandbox.device.api.controller.request.CreateDeviceRequest;
 import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
 import com.sandbox.device.api.domain.Device;
 import com.sandbox.device.api.enums.DeviceState;
+import com.sandbox.device.api.errorHandling.ErrorConstants;
 import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.repository.DeviceRepository;
 import org.junit.jupiter.api.Test;
@@ -40,8 +41,11 @@ public class DeviceServiceTest {
 
         when(deviceRepository.existsByNameAndBrand(request.name(), request.brand())).thenReturn(true);
 
-        assertThrows(DeviceBusinessRuleException.class, () -> deviceService.create(request));
+        DeviceBusinessRuleException exception = assertThrows(DeviceBusinessRuleException.class, () -> deviceService.create(request));
+
         verify(deviceRepository, never()).save(any(Device.class));
+        assertEquals(ErrorConstants.DEVICE_COMBO_ALREADY_EXISTS_CODE, exception.getApiError().getCode());
+        assertEquals(ErrorConstants.DEVICE_COMBO_ALREADY_EXISTS_CODE_MESSAGE, exception.getApiError().getMessage());
     }
 
     @Test
@@ -82,8 +86,11 @@ public class DeviceServiceTest {
 
         when(deviceRepository.findById(anyInt())).thenReturn(Optional.of(existingDevice));
 
-        assertThrows(DeviceBusinessRuleException.class, () -> deviceService.update(1, updateRequest));
+        DeviceBusinessRuleException exception = assertThrows(DeviceBusinessRuleException.class, () -> deviceService.update(1, updateRequest));
+
         verify(deviceRepository, never()).save(any(Device.class));
+        assertEquals(ErrorConstants.UPDATE_REQUEST_NEEDS_AT_LEAST_ONE_FIELD_CODE, exception.getApiError().getCode());
+        assertEquals(ErrorConstants.UPDATE_REQUEST_NEEDS_AT_LEAST_ONE_FIELD_MESSAGE, exception.getApiError().getMessage());
     }
 
     @Test
@@ -96,8 +103,12 @@ public class DeviceServiceTest {
         when(deviceRepository.findById(anyInt())).thenReturn(Optional.of(existingDevice));
         when(deviceRepository.existsByNameAndBrandAndIdNot("Device1", "Brand1", 1)).thenReturn(true);
 
-        assertThrows(DeviceBusinessRuleException.class, () -> deviceService.update(1, updateRequest));
+        DeviceBusinessRuleException exception = assertThrows(DeviceBusinessRuleException.class, () -> deviceService.update(1, updateRequest));
+
         verify(deviceRepository, never()).save(any(Device.class));
+
+        assertEquals(ErrorConstants.DEVICE_COMBO_MUST_BE_UNIQUE_CODE, exception.getApiError().getCode());
+        assertEquals(ErrorConstants.DEVICE_COMBO_MUST_BE_UNIQUE_MESSAGE, exception.getApiError().getMessage());
     }
 
     @Test
@@ -231,8 +242,11 @@ public class DeviceServiceTest {
 
         when(deviceRepository.findById(anyInt())).thenReturn(Optional.of(mockDevice));
 
-        assertThrows(DeviceBusinessRuleException.class, () -> deviceService.deleteById(1));
+        DeviceBusinessRuleException exception = assertThrows(DeviceBusinessRuleException.class, () -> deviceService.deleteById(1));
+
         verify(deviceRepository, never()).deleteById(anyInt());
+        assertEquals(ErrorConstants.DEVICE_IN_USE_CAN_NOT_BE_DELETED_CODE, exception.getApiError().getCode());
+        assertEquals(ErrorConstants.DEVICE_IN_USE_CAN_NOT_BE_DELETED_MESSAGE, exception.getApiError().getMessage());
     }
 
     @ParameterizedTest
