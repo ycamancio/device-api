@@ -7,6 +7,8 @@ import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
 import com.sandbox.device.api.domain.Device;
 import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.service.DeviceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import static com.sandbox.device.api.constants.EventConstants.*;
 
 @RestController
 @RequestMapping("/api/devices")
+@Tag(name = "Device Management", description = "API for managing devices with CRUD operations")
 public class DeviceController {
 
     private final DeviceService deviceService;
@@ -29,6 +32,7 @@ public class DeviceController {
 
     @PostMapping
     @LogEvent(id = CREATE_DEVICE_EVENT_ID, description = CREATE_DEVICE_EVENT_DESCRIPTION)
+    @Operation(summary = "Create a new device", description = "Creates a new device with the provided information")
     public ResponseEntity<Device> create(@Valid @RequestBody CreateDeviceRequest request) throws DeviceBusinessRuleException {
         return new ResponseEntity<>(deviceService.create(request), HttpStatus.CREATED);
     }
