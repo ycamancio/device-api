@@ -1,0 +1,36 @@
+# This stage uses a full JDK to compile and package your application
+FROM eclipse-temurin:21-jdk-alpine as builder
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy Maven project files first to leverage Docker cache for dependencies
+COPY pom.xml .
+COPY mvnw .
+COPY .mvn .mvn
+
+# Make the Maven wrapper executable
+RUN chmod +x mvnw
+
+# Download project dependencies. This step will be cached.
+RUN ./mvnw dependency:go-offline -B
+
+# Copy the source code
+COPY src ./src
+
+# Package the application into a JAR file.
+RUN ./mvnw clean package
+
+FROM eclipse-temurin:21-jre-alpine
+
+# Set the working directory for the final application
+WORKDIR /app
+
+ARG JAR_FILE=*.jar # Placeholder for the actual JAR name
+COPY --from=builder /app/target/api-1.0.jar app.jar
+
+# Expose the port your Spring Boot application listens on
+EXPOSE 8080
+
+# Command to run your application. Using the 'exec' form is recommended.
+CMD ["java", "-jar", "app.jar"]
