@@ -1,8 +1,10 @@
 package com.sandbox.device.api.service;
 
+import com.sandbox.device.api.annotation.Auditable;
 import com.sandbox.device.api.controller.request.CreateDeviceRequest;
 import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
 import com.sandbox.device.api.domain.Device;
+import com.sandbox.device.api.enums.AuditAction;
 import com.sandbox.device.api.enums.DeviceState;
 import com.sandbox.device.api.enums.ErrorType;
 import com.sandbox.device.api.errorHandling.ApiError;
@@ -14,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+import static com.sandbox.device.api.constants.AuditConstants.*;
 import static com.sandbox.device.api.constants.ErrorConstants.*;
 
 @Service
@@ -25,6 +28,7 @@ public class DeviceService {
         this.deviceRepository = deviceRepository;
     }
 
+    @Auditable(action= AuditAction.CREATE, description = ACTION_CREATE_DEVICE_DESCRIPTION)
     public Device create(CreateDeviceRequest request) throws DeviceBusinessRuleException {
 
         if(deviceRepository.existsByNameAndBrand(request.name(), request.brand())) {
@@ -36,6 +40,7 @@ public class DeviceService {
         return deviceRepository.save(device);
     }
 
+    @Auditable(action = AuditAction.UPDATE, description = ACTION_UPDATING_DEVICE_DESCRIPTION)
     public Device update(Integer id, UpdateDeviceRequest updateRequest) throws DeviceBusinessRuleException {
 
         Device deviceToUpdate = findById(id);
@@ -90,6 +95,7 @@ public class DeviceService {
         return deviceRepository.findAll();
     }
 
+    @Auditable(action = AuditAction.DELETE, description = ACTION_DELETING_DEVICE_DESCRIPTION)
     public void deleteById(Integer id) throws DeviceBusinessRuleException {
 
         Device device = findById(id);
