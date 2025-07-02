@@ -19,15 +19,18 @@ RUN ./mvnw dependency:go-offline -B
 COPY src ./src
 
 # Package the application into a JAR file.
-RUN ./mvnw clean package
+# For now, it only works skipping tests because Spring Boot tries to connect to the db that doesn't exist
+#in the container (by the time the tests are running)
+RUN ./mvnw clean package -DskipTests
+
 
 FROM eclipse-temurin:21-jre-alpine
 
 # Set the working directory for the final application
 WORKDIR /app
 
-ARG JAR_FILE=*.jar # Placeholder for the actual JAR name
-COPY --from=builder /app/target/api-1.0.jar app.jar
+# Copy the JAR file using a wildcard to avoid naming issues
+COPY --from=builder /app/target/*.jar app.jar
 
 # Expose the port your Spring Boot application listens on
 EXPOSE 8080

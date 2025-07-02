@@ -6,11 +6,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: device_db
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      POSTGRES_DB: device_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d device_db"]
       interval: 5s
@@ -22,6 +20,12 @@ services:
     build: .
     ports:
       - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: device_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
     depends_on:
       postgres:
         condition: service_healthy # Wait until postgres is healthy
