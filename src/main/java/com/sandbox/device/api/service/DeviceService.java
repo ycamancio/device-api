@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-import static com.sandbox.device.api.errorHandling.ErrorConstants.*;
+import static com.sandbox.device.api.constants.ErrorConstants.*;
 
 @Service
 public class DeviceService {

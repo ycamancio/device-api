@@ -4,7 +4,7 @@ import com.sandbox.device.api.controller.request.CreateDeviceRequest;
 import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
 import com.sandbox.device.api.domain.Device;
 import com.sandbox.device.api.enums.DeviceState;
-import com.sandbox.device.api.errorHandling.ErrorConstants;
+import com.sandbox.device.api.constants.ErrorConstants;
 import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.repository.DeviceRepository;
 import org.junit.jupiter.api.Test;

@@ -1,5 +1,6 @@
 package com.sandbox.device.api.errorHandling;
 
+import com.sandbox.device.api.constants.ErrorConstants;
 import com.sandbox.device.api.enums.ErrorType;
 
 public class ApiError {
