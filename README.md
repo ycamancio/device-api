@@ -95,7 +95,7 @@ From what I would like to implement:
 
 ### Final Notes
 Sorry for the delay in delivering this project. I received it Friday night, but this weekend was a bit busy for me.
-I kind of just worked in the project a bit on Monday and yesterday but still, I think it is in a good shape (despite the missing tests as mentioned earlier).
+I kind of just worked in the project a bit on Saturday, a bit on Monday and yesterday but still, I think it is in a good shape (despite the missing tests as mentioned earlier).
 I hope you like what you see and we can have a chat about it soon.
 
 Thanks for the opportunity!
