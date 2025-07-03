@@ -75,7 +75,7 @@ You can access the Requests collection in the `API Client - Bruno` folder.
 
 ### Additional features
 
-- **Auditing**: Automatically logs create, update, and delete actions in the database.
+- **Auditing**: Automatically create audit events into the database for every create, update, and delete actions in the application.
   - I added a auditing feature to save some actions performed in the application because I believe that in a real scenario we would need to
 know who did what and when.
   - Even though it is a way basic auditing, I believe is enough for this project.
@@ -88,7 +88,6 @@ know who did what and when.
 ### What is missing?
 From the original requirements:
 - **Better test coverage**: I couldn't write the tests for the web layer (Controller) which I could do with more two hours.
-Unfortunately, these are being busy days and I couldn't spend more time on this project.
 - Not only unit tests but also integration tests would be good to have.
 
 From what I would like to implement:
