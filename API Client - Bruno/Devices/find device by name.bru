@@ -1,0 +1,15 @@
+meta {
+  name: find device by name
+  type: http
+  seq: 7
+}
+
+get {
+  url: http://localhost:8080/api/devices?name=Device
+  body: none
+  auth: inherit
+}
+
+params:query {
+  name: Device
+}

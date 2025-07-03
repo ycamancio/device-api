@@ -1,0 +1,15 @@
+meta {
+  name: find device by brand
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:8080/api/devices?brand=LG
+  body: none
+  auth: inherit
+}
+
+params:query {
+  brand: LG
+}
