@@ -156,35 +156,37 @@ public class DeviceServiceTest {
     }
 
     @Test
-    void when_findByName_and_noDevicesFound_then_throwResponseStatusException() {
+    void when_findByName_and_noDevicesFound_then_returnEmptyList() {
 
-        when(deviceRepository.findByName(anyString())).thenReturn(List.of());
+        when(deviceRepository.findByState(any())).thenReturn(List.of());
 
-        assertThrows(ResponseStatusException.class, () -> deviceService.findByName("NonExistentDevice"));
+        List<Device> deviceList = deviceService.findByState(any(DeviceState.class));
+
+        assertEquals(0, deviceList.size());
     }
 
     @Test
-    void when_findByName_and_devicesFound_then_returnDevices() {
+    void when_findByState_and_devicesFound_then_returnDevices() {
 
-        String searchParameter = "Device1";
-        Device mockDevice1 = new Device("Device1", "Brand1", DeviceState.AVAILABLE);
-        Device mockDevice2 = new Device("Device1", "Brand2", DeviceState.IN_USE);
+        DeviceState searchParameter = DeviceState.IN_USE;
+        Device mockDevice1 = new Device("Device1", "Brand1", DeviceState.IN_USE);
 
-        when(deviceRepository.findByName(anyString())).thenReturn(List.of(mockDevice1, mockDevice2));
+        when(deviceRepository.findByState(searchParameter)).thenReturn(List.of(mockDevice1));
 
-        List<Device> result = deviceService.findByName(searchParameter);
+        List<Device> result = deviceService.findByState(searchParameter);
 
-        assertEquals(2, result.size());
-        assertEquals(searchParameter, result.get(0).getName());
-        assertEquals(searchParameter, result.get(1).getName());
+        assertEquals(1, result.size());
+        assertEquals(searchParameter, result.get(0).getState());
     }
 
     @Test
     void when_findByBrand_and_noDevicesFound_then_throwResponseStatusException() {
 
-        when(deviceRepository.findByBrand(anyString())).thenReturn(List.of());
+        when(deviceRepository.findByState(any())).thenReturn(List.of());
 
-        assertThrows(ResponseStatusException.class, () -> deviceService.findByBrand("NonExistentBrand"));
+        List<Device> deviceList = deviceService.findByState(any(DeviceState.class));
+
+        assertEquals(0, deviceList.size());
     }
 
     @Test

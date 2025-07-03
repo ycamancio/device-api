@@ -76,20 +76,12 @@ public class DeviceService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Device not found"));
     }
 
-    public List<Device> findByName(String name) {
-        List<Device> devices = deviceRepository.findByName(name);
-        if (devices.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No devices found with the given name");
-        }
-        return devices;
+    public List<Device> findByState(DeviceState state) {
+        return deviceRepository.findByState(state);
     }
 
     public List<Device> findByBrand(String brand) {
-        List<Device> devices = deviceRepository.findByBrand(brand);
-        if (devices.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No devices found with the given brand");
-        }
-        return devices;
+        return deviceRepository.findByBrand(brand);
     }
 
     public List<Device> findAll() {

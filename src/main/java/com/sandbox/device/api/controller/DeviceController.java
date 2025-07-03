@@ -5,6 +5,7 @@ import com.sandbox.device.api.controller.request.CreateDeviceRequest;
 import com.sandbox.device.api.controller.request.UpdateDeviceRequest;
 import com.sandbox.device.api.controller.response.ResponseStatusExceptionModel;
 import com.sandbox.device.api.domain.Device;
+import com.sandbox.device.api.enums.DeviceState;
 import com.sandbox.device.api.errorHandling.ApiError;
 import com.sandbox.device.api.exception.DeviceBusinessRuleException;
 import com.sandbox.device.api.service.DeviceService;
@@ -88,15 +89,15 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.findAll());
     }
 
-    @GetMapping(params = "name")
+    @GetMapping(params = "state")
     @LogEvent(id = FIND_DEVICE_BY_NAME_EVENT_ID, description = FIND_DEVICE_BY_NAME_EVENT_DESCRIPTION)
-    public ResponseEntity<List<Device>> findByName(@RequestParam @Parameter(description = "Filter devices by name") String name) {
-        return ResponseEntity.ok(deviceService.findByName(name));
+    public ResponseEntity<List<Device>> findByState(@RequestParam @Parameter(description = "Filter devices by state") DeviceState state) {
+        return ResponseEntity.ok(deviceService.findByState(state));
     }
 
     @GetMapping(params = "brand")
     @LogEvent(id = FIND_DEVICE_BY_BRAND_EVENT_ID, description = FIND_DEVICE_BY_BRAND_EVENT_DESCRIPTION)
-    public ResponseEntity<List<Device>> findByBrand(@RequestParam @Parameter(description = "Filter devices by name") String brand) {
+    public ResponseEntity<List<Device>> findByBrand(@RequestParam @Parameter(description = "Filter devices by brand") String brand) {
         return ResponseEntity.ok(deviceService.findByBrand(brand));
     }
 
